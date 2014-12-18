@@ -1,0 +1,48 @@
+package ormsamples;
+
+import org.orm.*;
+public class ListTemperaturaData {
+	private static final int ROW_COUNT = 100;
+	
+	public void listTestData() throws PersistentException {
+		System.out.println("Listing temperatura...");
+		orm.temperatura[] ormtemperaturas = orm.temperaturaDAO.listTemperaturaByQuery(null, null);
+		int length = Math.min(ormtemperaturas.length, ROW_COUNT);
+		for (int i = 0; i < length; i++) {
+			System.out.println(ormtemperaturas[i]);
+		}
+		System.out.println(length + " record(s) retrieved.");
+		
+	}
+	
+	public void listByCriteria() throws PersistentException  {
+		System.out.println("Listing temperatura by Criteria...");
+		orm.temperaturaCriteria lormtemperaturaCriteria = new orm.temperaturaCriteria();
+		// Please uncomment the follow line and fill in parameter(s) 
+		//lormtemperaturaCriteria.uid.eq();
+		lormtemperaturaCriteria.setMaxResults(ROW_COUNT);
+		orm.temperatura[] ormtemperaturas = lormtemperaturaCriteria.listTemperatura();
+		int length =ormtemperaturas== null ? 0 : Math.min(ormtemperaturas.length, ROW_COUNT); 
+		for (int i = 0; i < length; i++) {
+			 System.out.println(ormtemperaturas[i]);
+		}
+		System.out.println(length + " temperatura record(s) retrieved."); 
+		
+	}
+	
+	public static void main(String[] args) {
+		try {
+			ListTemperaturaData listTemperaturaData = new ListTemperaturaData();
+			try {
+				listTemperaturaData.listTestData();
+				//listTemperaturaData.listByCriteria();
+			}
+			finally {
+				orm.TemperaturaPersistentManager.instance().disposePersistentManager();
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
