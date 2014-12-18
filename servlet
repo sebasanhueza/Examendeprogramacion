@@ -1,0 +1,113 @@
+package servlet;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.orm.PersistentException;
+import org.orm.PersistentTransaction;
+
+import domain.Domain;
+
+/**
+ * Servlet implementation class FormularioCelcius
+ */
+@WebServlet("/FormularioCelcius")
+public class FormularioCelcius extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+	  List<Domain> mostrardatos = new ArrayList<Domain>();
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public FormularioCelcius() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		Date hora = new Date();
+		String Strhora = hora.toString();
+		
+		String accion = request.getParameter("accion");
+		if(accion.equals("guardar")){
+			String fecha= request.getParameter("fecha");
+			int celcius= Integer.parseInt(request.getParameter("celcius"));
+			int kelvin= Integer.parseInt(request.getParameter("kelvin"));
+			
+			mostrardatos.add(new Domain(fecha,celcius,kelvin));
+			 try {
+				 createTestData(fecha,celcius,kelvin);
+				 request.setAttribute("listaregistros",mostrardatos);
+				 request.setAttribute("mensaje"," ingreso exitoso :D ");
+				 request.getRequestDispatcher("/formulario.jsp").forward(request, response);;
+				
+			} catch (PersistentException e) {
+				e.printStackTrace();
+				
+			}
+		}
+		
+	}
+	
+	public void createTestData(String fecha,int celcius,int kelvin) throws PersistentException {
+		PersistentTransaction t = orm.TemperaturaPersistentManager.instance().getSession().beginTransaction();
+		try {
+			orm.temperatura lormtemperatura = orm.temperaturaDAO.createTemperatura();
+			lormtemperatura.setFecha("fecha");
+			lormtemperatura.setCelcius(celcius);
+			lormtemperatura.setKelvin(kelvin);
+			orm.temperaturaDAO.save(lormtemperatura);
+			t.commit();
+		}
+		catch (Exception e) {
+			t.rollback();
+		}
+		
+	}
+	
+	public List<Domain> mostrarRegistro () {
+		List<Domain> mostrardatos = new ArrayList<Domain>();
+		orm.temperatura[]ormTemperaturas;
+		
+		try {
+			
+			ormTemperaturas = orm.temperaturaDAO.listTemperaturaByQuery(null, null);
+			int length = ormTemperaturas.length;
+			for (int i = 0; i < length; i++) {
+				System.out.println(ormTemperaturas[i]);
+				mostrardatos.add(new domain.Domain("uid: "+(ormTemperaturas[i])+" "+ ormTemperaturas[i].getFecha(),ormTemperaturas[i].getCelcius(),ormTemperaturas[i].getKelvin()));
+				
+			}
+			return mostrardatos;
+			
+			
+		} catch (PersistentException e) {
+			e.printStackTrace();
+			return null;
+			
+		}
+	
+	}
+	
+	
+
+}
