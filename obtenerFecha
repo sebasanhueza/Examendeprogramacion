@@ -1,0 +1,10 @@
+package metodos;
+
+import java.util.Date;
+
+public class obtenerFecha {
+	
+	Date fecha = new Date();
+	String StrFecha = fecha.toString();
+	
+}
