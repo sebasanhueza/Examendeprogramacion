@@ -1,0 +1,11 @@
+package metodos;
+
+public class convertirAkelvin {
+	
+
+	int celcius =0;
+	int kelvin = celcius -273;
+	
+	
+
+}
